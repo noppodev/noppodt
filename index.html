@@ -31,7 +31,7 @@
         }
 
         @keyframes progress-shimmer {
-            0% { background-position: -200% 0; }
+            0! { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
         .progress-fill {
@@ -59,10 +59,10 @@
             </div>
 
             <div id="auth-area" class="flex items-center gap-3">
-                <!-- ユーザー名表示: スマホでも見えるように hidden sm:flex を flex に変更 -->
                 <div id="user-info" class="flex flex-col items-end leading-none">
-                    <span id="user-display-name" class="text-xs font-bold text-slate-900">ゲスト</span>
-                    <span id="login-perk" class="text-[9px] text-slate-400 font-medium">ログインで機能を解放</span>
+                    <!-- メールアドレスではなくユーザーIDを表示 -->
+                    <span id="user-display-name" class="text-xs font-bold text-slate-900">Guest User</span>
+                    <span id="login-perk" class="text-[9px] text-slate-400 font-medium">Login for custom ID</span>
                 </div>
                 <button id="login-btn" onclick="goToLogin()" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-full font-bold hover:bg-slate-800 transition active:scale-95 shadow-md">
                     ログイン
@@ -87,16 +87,17 @@
             <!-- Left Column: Connection -->
             <div id="tab-transfer" class="lg:col-span-7 space-y-6 tab-content active">
                 
-                <!-- My ID Card (Fixed Layout) -->
+                <!-- My ID Card (Fixed Layout for long IDs) -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Your Transfer ID</h2>
-                    <div class="flex items-center justify-between gap-4">
-                        <button onclick="copyMyId()" class="flex-1 min-w-0 flex flex-col items-start group/btn">
-                            <span id="my-peer-id" class="mono text-xl sm:text-2xl font-bold text-slate-800 break-all text-left">...</span>
-                            <span class="text-[10px] text-blue-500 font-bold opacity-100 sm:opacity-0 group-hover/btn:opacity-100 transition-opacity mt-1">コピーする</span>
+                    <div class="flex items-center justify-between gap-4 w-full">
+                        <!-- ID area with flexible shrinking -->
+                        <button onclick="copyMyId()" class="flex-1 min-w-0 flex flex-col items-start group/btn text-left overflow-hidden">
+                            <span id="my-peer-id" class="mono text-xl sm:text-2xl font-bold text-slate-800 break-all leading-tight">...</span>
+                            <span class="text-[10px] text-blue-500 font-bold mt-1">タップしてコピー</span>
                         </button>
-                        <!-- ボタンが重ならないよう z-index と配置を調整 -->
-                        <button onclick="showMyQR()" class="flex-shrink-0 z-10 p-4 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition shadow-sm active:scale-90 border border-blue-100">
+                        <!-- QR Button: Fixed size and guaranteed clickable space -->
+                        <button onclick="showMyQR()" class="flex-shrink-0 p-4 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition shadow-sm active:scale-90 border border-blue-100 ml-2" title="QRコードを表示">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3"/><path d="M12 14v3"/><path d="M7 12h3"/><path d="M14 12h3"/></svg>
                         </button>
                     </div>
@@ -135,7 +136,7 @@
                 </section>
             </div>
 
-            <!-- Right Column: Logs & Progress -->
+            <!-- Right Column -->
             <div id="tab-history" class="lg:col-span-5 space-y-6 tab-content">
                 <div id="progress-container" class="hidden space-y-3">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Transfer</h3>
@@ -157,13 +158,13 @@
         </div>
     </main>
 
-    <!-- Modals (QR, Scanner, etc.) -->
+    <!-- Modals -->
     <div id="qr-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] hidden items-center justify-center p-6" onclick="closeQRModal()">
         <div class="bg-white rounded-[2.5rem] w-full max-w-xs p-8 shadow-2xl scale-90 transition-all duration-300" onclick="event.stopPropagation()">
             <div class="flex flex-col items-center text-center">
                 <div class="w-12 h-1.5 bg-slate-100 rounded-full mb-6"></div>
                 <h3 class="font-black text-xl mb-2 text-slate-800">Scan to Connect</h3>
-                <p class="text-[10px] text-slate-400 font-bold mb-6">このコードを相手のカメラで読み取ってください</p>
+                <p class="text-[10px] text-slate-400 font-bold mb-6">相手のカメラで読み取ってください</p>
                 <div id="qrcode-container" class="bg-white p-4 border-4 border-slate-50 rounded-3xl mb-8"></div>
                 <button onclick="closeQRModal()" class="w-full bg-slate-100 text-slate-900 py-4 rounded-2xl font-bold hover:bg-slate-200 transition">閉じる</button>
             </div>
@@ -173,7 +174,7 @@
     <div id="scanner-modal" class="fixed inset-0 bg-black z-[100] hidden flex-col items-center justify-center">
         <div id="reader" class="w-full h-full max-w-md"></div>
         <div class="absolute bottom-10 left-0 right-0 px-8 flex flex-col items-center gap-4">
-            <p class="text-white text-xs font-bold bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/20">相手のQRコードを枠内に収めてください</p>
+            <p class="text-white text-xs font-bold bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/20">QRコードを枠内に収めてください</p>
             <button onclick="closeScanner()" class="w-full max-w-xs bg-red-500/20 text-red-500 border border-red-500/50 py-4 rounded-2xl font-bold backdrop-blur-xl">キャンセル</button>
         </div>
     </div>
@@ -213,12 +214,10 @@
 
         async function checkAuth() {
             const params = new URLSearchParams(window.location.search);
-            // LINE等のアプリ内ブラウザでのリダイレクト安定化
             const token = params.get('token') || localStorage.getItem('noppo_token');
             
             if (params.get('token')) {
                 localStorage.setItem('noppo_token', params.get('token'));
-                // URLクエリを削除してクリーンなURLに
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
@@ -229,24 +228,31 @@
                     });
                     if (response.ok) {
                         const user = await response.json();
-                        const userName = user.email.split('@')[0];
-                        document.getElementById('user-display-name').innerText = userName;
-                        document.getElementById('login-perk').innerText = "固定ID & P2P最適化";
-                        document.getElementById('login-perk').classList.replace('text-slate-400', 'text-green-500');
+                        
+                        // ユーザーのカスタムIDを取得（Supabaseのmetadata等から想定）
+                        // ここでは、ユーザーが設定したID（なければemailの頭部分）を優先
+                        const customId = user.user_metadata?.custom_id || user.email.split('@')[0];
+                        
+                        document.getElementById('user-display-name').innerText = customId;
+                        document.getElementById('login-perk').innerText = "Premium: Custom ID Active";
+                        document.getElementById('login-perk').classList.replace('text-slate-400', 'text-blue-600');
                         document.getElementById('login-btn').classList.add('hidden');
                         document.getElementById('logout-btn').classList.remove('hidden');
-                        initPeer(user.id);
+                        
+                        // ログインユーザーはカスタムIDをPeerIDとして使用
+                        initPeer(customId);
                         return;
                     }
                 } catch (e) {
-                    addLog("認証エラーが発生しました", "error");
+                    addLog("認証エラー", "error");
                 }
             }
             initPeer(null);
         }
 
         function initPeer(id) {
-            const peerId = id ? `noppo-${id.substring(0, 8)}` : null;
+            // ログイン済みならそのID、未ログインならランダムID
+            const peerId = id ? `noppo-${id}` : null;
             if (peer) {
                 peer.destroy();
                 clearInterval(heartbeatInterval);
@@ -284,14 +290,15 @@
             });
             
             peer.on('disconnected', () => {
-                addLog("再接続を試みています...", "error");
                 peer.reconnect();
             });
 
             peer.on('error', (err) => {
-                addLog(`エラー: ${err.type}`, "error");
-                if (err.type === 'server-error' || err.type === 'network') {
-                    setTimeout(() => initPeer(id), 5000);
+                if (err.type === 'unavailable-id') {
+                    addLog("IDが既に使用されています。ランダムIDで開始します。", "error");
+                    initPeer(null);
+                } else {
+                    addLog(`エラー: ${err.type}`, "error");
                 }
             });
         }
@@ -309,14 +316,13 @@
             const remoteId = targetId || document.getElementById('remote-peer-id').value.trim();
             if (!remoteId) return;
             addLog("接続中...");
-            // reliable: true でパケット損失を防止
             conn = peer.connect(remoteId, { reliable: true });
             setupConnectionListeners();
         }
 
         function setupConnectionListeners() {
             conn.on('open', () => {
-                updateStatus(`Connected: ${conn.peer.substring(0,12)}...`, true);
+                updateStatus(`Connected`, true);
                 addLog("接続成功", "success");
             });
             conn.on('data', (data) => {
@@ -324,10 +330,10 @@
             });
             conn.on('close', () => {
                 updateStatus("Ready for connection", false);
-                addLog("デバイスとの接続が終了しました");
+                addLog("接続終了");
             });
             conn.on('error', (err) => {
-                addLog("接続に失敗しました", "error");
+                addLog("接続エラー", "error");
             });
         }
 
@@ -353,7 +359,7 @@
                     });
                     addLog(`${file.name} を送信`, "success");
                 } catch (err) {
-                    addLog("送信に失敗しました", "error");
+                    addLog("送信失敗", "error");
                 }
                 setTimeout(() => removeProgressCard(transferId), 1500);
             };
@@ -421,8 +427,13 @@
             container.prepend(div);
         }
 
-        function showMyQR() { document.getElementById('qr-modal').classList.remove('hidden'); document.getElementById('qr-modal').classList.add('flex'); }
+        function showMyQR() { 
+            const modal = document.getElementById('qr-modal');
+            modal.classList.remove('hidden'); 
+            modal.classList.add('flex'); 
+        }
         function closeQRModal() { document.getElementById('qr-modal').classList.add('hidden'); }
+        
         function openScanner() {
             document.getElementById('scanner-modal').classList.remove('hidden');
             document.getElementById('scanner-modal').classList.add('flex');
@@ -431,8 +442,8 @@
                 document.getElementById('remote-peer-id').value = txt;
                 closeScanner();
                 connectToPeer(txt);
-            }).catch(err => {
-                addLog("カメラの起動に失敗しました", "error");
+            }).catch(() => {
+                addLog("カメラ起動失敗", "error");
                 closeScanner();
             });
         }
@@ -467,7 +478,6 @@
         function copyMyId() {
             const id = document.getElementById('my-peer-id').innerText;
             if (id === "...") return;
-            // LINEなどの制限された環境向けのフォールバック
             if (!navigator.clipboard) {
                 const textArea = document.createElement("textarea");
                 textArea.value = id;
@@ -475,7 +485,6 @@
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                addLog("IDをコピーしました", "success");
             } else {
                 navigator.clipboard.writeText(id).then(() => {
                     addLog("IDをコピーしました", "success");
@@ -486,7 +495,6 @@
         function clearLogs() { document.getElementById('logs').innerHTML = '<div id="empty-log" class="h-32 flex items-center justify-center text-slate-300 text-xs italic font-medium">No recent activity</div>'; }
         
         function goToLogin() { 
-            // 現在のURLを取得し、リダイレクト先として渡す
             const currentUrl = window.location.origin + window.location.pathname;
             window.location.href = `${AUTH_WORKER_URL}?redirect=${encodeURIComponent(currentUrl)}`; 
         }
