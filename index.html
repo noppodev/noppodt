@@ -6,25 +6,33 @@
     <title>Noppo Direct Transfer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <!-- QR Code Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         .drop-zone {
             border: 2px dashed #cbd5e1;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         .drop-zone.active {
             border-color: #3b82f6;
             background-color: #eff6ff;
+            transform: scale(1.02);
         }
-        /* カスタムスクロールバー */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .loading-pulse { animation: pulse-soft 1.5s infinite; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
 
-    <!-- Header -->
     <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
         <h1 class="text-xl font-bold text-blue-600 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.23 3.48a2 2 0 0 1 0 3.32L16 23.27a2 2 0 0 1-3-1.66V18.73a2 2 0 0 1 3-1.66Z"/><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h4"/></svg>
@@ -38,52 +46,57 @@
     </header>
 
     <main class="max-w-4xl mx-auto p-6 space-y-8">
-        <!-- Connection Panel -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- My ID -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">あなたの転送ID</h2>
-                <div class="flex items-center gap-2">
-                    <code id="my-peer-id" class="text-2xl font-mono font-bold text-slate-700">準備中...</code>
-                    <button onclick="copyMyId()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition" title="コピー">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    </button>
+            <!-- My ID & QR -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">あなたの転送ID</h2>
+                    <div class="flex items-center gap-2">
+                        <code id="my-peer-id" class="text-2xl font-mono font-bold text-slate-700">準備中...</code>
+                        <button onclick="copyMyId()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition" title="コピー">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        <button onclick="showMyQR()" class="p-2 hover:bg-blue-50 rounded-lg text-blue-500 transition" title="QR表示">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3"/><path d="M12 14v3"/><path d="M7 12h3"/><path d="M14 12h3"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2">このIDをコピーして相手に伝えてください。</p>
+                <p class="text-[10px] text-slate-400 mt-2 italic">相手にこのIDを伝えるか、QRコードを見せてください。</p>
             </div>
 
-            <!-- Connect to Someone -->
+            <!-- Connect & Scanner -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">相手に接続する</h2>
                 <div class="flex gap-2">
                     <input type="text" id="remote-peer-id" placeholder="相手のIDを入力..." class="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                    <button id="connect-btn" onclick="connectToPeer()" class="bg-slate-800 text-white px-5 py-2 rounded-xl hover:bg-slate-900 transition text-sm font-semibold">接続</button>
+                    <button id="scan-btn" onclick="openScanner()" class="p-2 bg-slate-100 rounded-xl text-slate-600 hover:bg-slate-200 transition" title="QRスキャン">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" x2="17" y1="12" y2="12"/></svg>
+                    </button>
+                    <button id="connect-btn" onclick="connectToPeer()" class="bg-slate-800 text-white px-5 py-2 rounded-xl hover:bg-slate-900 transition text-sm font-semibold shadow-md active:scale-95">接続</button>
                 </div>
                 <div id="connection-status" class="mt-2 text-xs font-bold text-slate-400 italic">未接続</div>
             </div>
         </section>
 
         <!-- Transfer Area -->
-        <section id="transfer-section" class="hidden opacity-50 pointer-events-none transition-all duration-500 scale-95">
-            <div id="drop-zone" class="drop-zone bg-white rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
+        <section id="transfer-section" class="hidden opacity-0 transition-all duration-300 transform translate-y-4">
+            <div id="drop-zone" class="drop-zone bg-white rounded-3xl p-10 flex flex-col items-center justify-center space-y-4 shadow-sm">
                 <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 </div>
                 <div class="text-center">
                     <p class="text-lg font-bold text-slate-700">ここにファイルをドロップ</p>
-                    <p class="text-slate-400 text-sm">または、ファイルを選択してください（複数可）</p>
+                    <p class="text-slate-400 text-sm">直接相手に送信します（複数可）</p>
                 </div>
                 <input type="file" id="file-input" class="hidden" multiple>
-                <button onclick="document.getElementById('file-input').click()" class="px-8 py-2.5 bg-white border-2 border-slate-100 rounded-full hover:border-blue-200 hover:bg-blue-50 transition font-bold text-slate-600">ファイルを選択</button>
+                <button onclick="document.getElementById('file-input').click()" class="px-8 py-2.5 bg-white border-2 border-slate-100 rounded-full hover:border-blue-200 hover:bg-blue-50 transition font-bold text-slate-600 shadow-sm active:scale-95">ファイルを選択</button>
             </div>
         </section>
 
         <!-- Progress List -->
         <div id="progress-container" class="space-y-3 hidden">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">現在の状況</h3>
-            <div id="active-transfers" class="space-y-2">
-                <!-- Progress cards injected here -->
-            </div>
+            <div id="active-transfers" class="space-y-2"></div>
         </div>
 
         <!-- Activity Logs -->
@@ -93,38 +106,49 @@
                 <button onclick="clearLogs()" class="text-[10px] text-slate-400 hover:underline">ログをクリア</button>
             </div>
             <div id="logs" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                <div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border">まだアクティビティはありません</div>
+                <div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border italic">まだアクティビティはありません</div>
             </div>
         </section>
     </main>
 
-    <!-- Receive Modal Placeholder -->
-    <div id="preview-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl scale-90 transition-transform">
-            <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
-                <span class="p-2 bg-green-100 text-green-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                </span>
+    <!-- QR Code Modal (Show) -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl flex flex-col items-center">
+            <h3 class="font-bold text-lg mb-6 text-slate-700">あなたのQRコード</h3>
+            <div id="qrcode-container" class="bg-white p-4 border rounded-2xl mb-6"></div>
+            <button onclick="closeQRModal()" class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-black transition">閉じる</button>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden flex-col items-center justify-center p-4">
+        <div class="w-full max-w-md aspect-square bg-black rounded-3xl overflow-hidden relative border-4 border-blue-500/30">
+            <div id="reader" class="w-full h-full"></div>
+        </div>
+        <p class="text-white mt-6 text-sm font-bold bg-blue-600/20 px-4 py-2 rounded-full">相手のQRコードをスキャンしてください</p>
+        <button onclick="closeScanner()" class="mt-8 text-white/50 hover:text-white font-bold transition">キャンセル</button>
+    </div>
+
+    <!-- Receive Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl scale-90 transition-all duration-300 text-center">
+            <h3 class="font-bold text-xl mb-4 flex items-center justify-center gap-2 text-green-600">
                 受信完了！
             </h3>
-            <div id="preview-content" class="mb-6 rounded-2xl overflow-hidden border bg-slate-50 flex items-center justify-center min-h-[200px]">
-                <!-- Preview image or icon will be here -->
-            </div>
-            <div class="flex flex-col gap-2">
-                <p id="preview-filename" class="text-center font-mono text-sm font-bold truncate px-4"></p>
-                <button onclick="closePreview()" class="mt-4 bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-black transition">閉じる</button>
-            </div>
+            <div id="preview-content" class="mb-6 rounded-2xl overflow-hidden border bg-slate-50 flex items-center justify-center min-h-[200px]"></div>
+            <p id="preview-filename" class="font-mono text-xs font-bold truncate px-4 text-slate-500 mb-4"></p>
+            <button onclick="closePreview()" class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-black transition shadow-lg">閉じる</button>
         </div>
     </div>
 
     <script>
-        // Noppo Auth Settings
         const AUTH_WORKER_URL = "https://noppo-auth.noppo5319.workers.dev";
         const SUPABASE_URL = "https://vvavasrdxguqkiigcxkl.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
 
         let peer = null;
         let conn = null;
+        let html5QrCode = null;
 
         // 1. Auth Logic
         function goToLogin() {
@@ -140,12 +164,10 @@
         async function checkAuth() {
             const params = new URLSearchParams(window.location.search);
             const tokenFromUrl = params.get('token');
-            
             if (tokenFromUrl) {
                 localStorage.setItem('noppo_token', tokenFromUrl);
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-
             const token = localStorage.getItem('noppo_token');
             if (token) {
                 try {
@@ -169,15 +191,27 @@
         // 2. PeerJS Logic
         function initPeer(id) {
             const peerId = id ? `noppo-${id.substring(0, 8)}` : null;
-            peer = new Peer(peerId, { debug: 1 });
+            peer = new Peer(peerId, { 
+                debug: 1,
+                config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }] }
+            });
 
             peer.on('open', (assignedId) => {
                 document.getElementById('my-peer-id').innerText = assignedId;
                 addLog("転送システムがオンラインになりました");
+                // QRコード生成の準備
+                new QRCode(document.getElementById("qrcode-container"), {
+                    text: assignedId,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#0f172a",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
             });
 
             peer.on('connection', (connection) => {
-                if (conn) conn.close(); // 新しい接続を優先
+                if (conn) conn.close();
                 conn = connection;
                 setupConnectionListeners();
             });
@@ -187,12 +221,12 @@
             });
         }
 
-        function connectToPeer() {
-            const remoteId = document.getElementById('remote-peer-id').value.trim();
+        function connectToPeer(targetId) {
+            const remoteId = targetId || document.getElementById('remote-peer-id').value.trim();
             if (!remoteId) return;
 
-            addLog("相手を探しています...");
-            conn = peer.connect(remoteId);
+            addLog("接続を開始...");
+            conn = peer.connect(remoteId, { reliable: true });
             setupConnectionListeners();
         }
 
@@ -200,7 +234,7 @@
             conn.on('open', () => {
                 updateStatus(`接続済み: ${conn.peer}`, true);
                 addLog(`接続成功: ${conn.peer}`);
-                window.onbeforeunload = () => "転送中かもしれません。ページを閉じますか？";
+                window.onbeforeunload = () => "転送中です。ページを閉じますか？";
             });
 
             conn.on('data', (data) => {
@@ -208,86 +242,86 @@
             });
 
             conn.on('close', () => {
-                updateStatus("切断されました", false);
-                addLog("接続が切れました。");
+                updateStatus("未接続", false);
+                addLog("接続が解除されました");
                 window.onbeforeunload = null;
             });
         }
 
-        function updateStatus(text, isActive) {
-            const statusEl = document.getElementById('connection-status');
-            const sectionEl = document.getElementById('transfer-section');
-            statusEl.innerText = text;
-            statusEl.className = isActive ? "mt-2 text-xs font-bold text-green-500" : "mt-2 text-xs font-bold text-slate-400";
+        // 3. QR & Scanner Logic
+        function showMyQR() {
+            document.getElementById('qr-modal').classList.remove('hidden');
+            document.getElementById('qr-modal').classList.add('flex');
+        }
+
+        function closeQRModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
+            document.getElementById('qr-modal').classList.remove('flex');
+        }
+
+        async function openScanner() {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            document.getElementById('scanner-modal').classList.add('flex');
             
-            if (isActive) {
-                sectionEl.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
-                sectionEl.classList.add('scale-100');
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            try {
+                await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                    document.getElementById('remote-peer-id').value = decodedText;
+                    closeScanner();
+                    connectToPeer(decodedText);
+                });
+            } catch (err) {
+                addLog("カメラの起動に失敗しました", "error");
+                closeScanner();
+            }
+        }
+
+        function closeScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('scanner-modal').classList.add('hidden');
+                    document.getElementById('scanner-modal').classList.remove('flex');
+                });
             } else {
-                sectionEl.classList.add('opacity-50', 'pointer-events-none');
-                sectionEl.classList.remove('scale-100');
+                document.getElementById('scanner-modal').classList.add('hidden');
+                document.getElementById('scanner-modal').classList.remove('flex');
             }
         }
 
-        // 3. File Transfer & UI Logic
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('active');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
-        async function handleFiles(fileList) {
-            if (!conn || !conn.open) return addLog("接続が必要です", "error");
-            
-            const files = Array.from(fileList);
+        // 4. File Transfer
+        function handleFiles(fileList) {
+            if (!conn || !conn.open) return addLog("先に接続が必要です", "error");
             document.getElementById('progress-container').classList.remove('hidden');
-
-            for (const file of files) {
-                await sendFile(file);
-            }
+            Array.from(fileList).forEach(file => sendFile(file));
         }
 
-        function sendFile(file) {
-            return new Promise((resolve) => {
-                const transferId = 'tx-' + Math.random().toString(36).substr(2, 9);
-                createProgressCard(transferId, file.name, "送信中...");
+        async function sendFile(file) {
+            const transferId = 'tx-' + Math.random().toString(36).substr(2, 9);
+            createProgressCard(transferId, file.name, "読み込み中...");
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    conn.send({
-                        type: 'file-transfer',
-                        file: e.target.result,
-                        fileName: file.name,
-                        fileType: file.type,
-                        fileSize: file.size
-                    });
-                    
-                    updateProgressCard(transferId, 100, "送信完了");
-                    addLog(`送信完了: ${file.name}`, "success");
-                    setTimeout(() => removeProgressCard(transferId), 3000);
-                    resolve();
-                };
-
-                // PeerJSの送信自体には標準的なProgressイベントがないため、読み込み完了で一旦100%としています
-                reader.readAsArrayBuffer(file);
-            });
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                updateProgressCard(transferId, 60, "送信中...");
+                conn.send({
+                    type: 'file-transfer',
+                    file: e.target.result,
+                    fileName: file.name,
+                    fileType: file.type
+                });
+                updateProgressCard(transferId, 100, "完了");
+                addLog(`送信完了: ${file.name}`, "success");
+                setTimeout(() => removeProgressCard(transferId), 2000);
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function handleReceiveFile(data) {
             const blob = new Blob([data.file], { type: data.fileType });
             const url = URL.createObjectURL(blob);
-            
-            addLog(`受信: ${data.fileName}`, "success");
+            addLog(`受信完了: ${data.fileName}`, "success");
             showPreview(url, data.fileName, data.fileType);
-
-            // 自動ダウンロード
             const a = document.createElement('a');
             a.href = url;
             a.download = data.fileName;
@@ -295,19 +329,32 @@
         }
 
         // UI Helpers
+        function updateStatus(text, isActive) {
+            const statusEl = document.getElementById('connection-status');
+            const sectionEl = document.getElementById('transfer-section');
+            statusEl.innerText = text;
+            statusEl.className = isActive ? "mt-2 text-xs font-bold text-green-500" : "mt-2 text-xs font-bold text-slate-400";
+            if (isActive) {
+                sectionEl.classList.remove('hidden');
+                setTimeout(() => sectionEl.classList.remove('opacity-0', 'translate-y-4'), 10);
+            } else {
+                sectionEl.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => sectionEl.classList.add('hidden'), 300);
+            }
+        }
+
         function createProgressCard(id, name, status) {
             const container = document.getElementById('active-transfers');
             const html = `
-                <div id="${id}" class="bg-white p-4 rounded-2xl border shadow-sm space-y-2">
+                <div id="${id}" class="bg-white p-4 rounded-2xl border shadow-sm space-y-2 animate-in fade-in slide-in-from-top-2">
                     <div class="flex justify-between items-center text-xs">
                         <span class="font-bold truncate max-w-[200px] text-slate-600">${name}</span>
-                        <span id="${id}-status" class="text-blue-500 font-bold">${status}</span>
+                        <span id="${id}-status" class="text-blue-500 font-bold loading-pulse">${status}</span>
                     </div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div id="${id}-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 10%"></div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                        <div id="${id}-bar" class="bg-blue-500 h-full transition-all duration-500" style="width: 10%"></div>
                     </div>
-                </div>
-            `;
+                </div>`;
             container.insertAdjacentHTML('beforeend', html);
         }
 
@@ -315,81 +362,60 @@
             const bar = document.getElementById(`${id}-bar`);
             const statusEl = document.getElementById(`${id}-status`);
             if (bar) bar.style.width = percent + '%';
-            if (statusEl) statusEl.innerText = status;
-            if (percent === 100 && statusEl) statusEl.className = "text-green-500 font-bold";
+            if (statusEl) {
+                statusEl.innerText = status;
+                if (percent === 100) statusEl.className = "text-green-500 font-bold";
+            }
         }
 
         function removeProgressCard(id) {
             const el = document.getElementById(id);
-            if (el) el.remove();
-            if (document.getElementById('active-transfers').children.length === 0) {
-                document.getElementById('progress-container').classList.add('hidden');
-            }
+            if (el) { el.classList.add('opacity-0'); setTimeout(() => {
+                el.remove();
+                if (document.getElementById('active-transfers').children.length === 0) document.getElementById('progress-container').classList.add('hidden');
+            }, 300); }
         }
 
         function showPreview(url, name, type) {
             const modal = document.getElementById('preview-modal');
             const content = document.getElementById('preview-content');
-            const filename = document.getElementById('preview-filename');
-            
-            content.innerHTML = '';
-            filename.innerText = name;
-
-            if (type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = 'max-h-[300px] object-contain';
-                content.appendChild(img);
-            } else {
-                content.innerHTML = `
-                    <div class="text-slate-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    </div>
-                `;
-            }
-
+            document.getElementById('preview-filename').innerText = name;
+            content.innerHTML = type.startsWith('image/') ? `<img src="${url}" class="max-h-[300px] object-contain animate-in zoom-in-95">` : `<div class="text-slate-200"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>`;
             modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => modal.firstElementChild.classList.remove('scale-90'), 10);
+            setTimeout(() => { modal.classList.add('opacity-100', 'flex'); modal.querySelector('div').classList.remove('scale-90'); }, 10);
         }
 
         function closePreview() {
             const modal = document.getElementById('preview-modal');
-            modal.firstElementChild.classList.add('scale-90');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 200);
+            modal.querySelector('div').classList.add('scale-90');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
         function addLog(message, type = "info") {
             const logs = document.getElementById('logs');
             const emptyMsg = document.getElementById('empty-log');
             if (emptyMsg) emptyMsg.remove();
-
-            const colors = {
-                info: "bg-white text-slate-500 border-slate-100",
-                error: "bg-red-50 text-red-600 border-red-100",
-                success: "bg-green-50 text-green-600 border-green-100"
-            };
-
+            const colors = { info: "bg-white", error: "bg-red-50 text-red-600", success: "bg-green-50 text-green-600" };
             const div = document.createElement('div');
-            div.className = `p-3 rounded-xl text-[11px] border shadow-sm transition-all animate-in fade-in slide-in-from-left-2 ${colors[type]}`;
+            div.className = `p-3 rounded-xl text-[11px] border shadow-sm transition-all animate-in fade-in slide-in-from-bottom-2 ${colors[type]}`;
             div.innerHTML = `<span class="opacity-50 mr-2">${new Date().toLocaleTimeString()}</span> ${message}`;
             logs.prepend(div);
         }
 
-        function clearLogs() {
-            document.getElementById('logs').innerHTML = '<div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border">まだアクティビティはありません</div>';
-        }
+        function clearLogs() { document.getElementById('logs').innerHTML = '<div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border italic">まだアクティビティはありません</div>'; }
 
         function copyMyId() {
             const id = document.getElementById('my-peer-id').innerText;
             if (id === "準備中...") return;
-            navigator.clipboard.writeText(id).then(() => {
-                addLog("IDをコピーしました");
-            });
+            navigator.clipboard.writeText(id).then(() => addLog("IDをコピーしました"));
         }
+
+        const dropZoneEl = document.getElementById('drop-zone');
+        dropZoneEl.addEventListener('dragover', (e) => { e.preventDefault(); dropZoneEl.classList.add('active'); });
+        dropZoneEl.addEventListener('dragleave', () => dropZoneEl.classList.remove('active'));
+        dropZoneEl.addEventListener('drop', (e) => { e.preventDefault(); dropZoneEl.classList.remove('active'); handleFiles(e.dataTransfer.files); });
+        document.getElementById('file-input').addEventListener('change', (e) => handleFiles(e.target.files));
 
         window.onload = checkAuth;
     </script>
