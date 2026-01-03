@@ -15,20 +15,25 @@
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
 
     <!-- Header -->
-    <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
+    <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
         <h1 class="text-xl font-bold text-blue-600 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.23 3.48a2 2 0 0 1 0 3.32L16 23.27a2 2 0 0 1-3-1.66V18.73a2 2 0 0 1 3-1.66Z"/><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h4"/></svg>
             Noppo Direct Transfer
         </h1>
         <div id="auth-status" class="text-sm flex items-center gap-3">
-            <span id="user-display-name" class="text-slate-500 font-medium">ゲスト</span>
-            <button id="login-btn" onclick="goToLogin()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full hover:bg-blue-700 transition">Noppoログイン</button>
-            <button id="logout-btn" onclick="logout()" class="hidden text-slate-400 hover:text-red-500">ログアウト</button>
+            <span id="user-display-name" class="text-slate-500 font-medium italic">ゲスト</span>
+            <button id="login-btn" onclick="goToLogin()" class="bg-blue-600 text-white px-4 py-1.5 rounded-full hover:bg-blue-700 transition font-semibold">Noppoログイン</button>
+            <button id="logout-btn" onclick="logout()" class="hidden text-slate-400 hover:text-red-500 font-medium">ログアウト</button>
         </div>
     </header>
 
@@ -37,50 +42,80 @@
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- My ID -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">あなたの転送ID</h2>
+                <h2 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">あなたの転送ID</h2>
                 <div class="flex items-center gap-2">
                     <code id="my-peer-id" class="text-2xl font-mono font-bold text-slate-700">準備中...</code>
                     <button onclick="copyMyId()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition" title="コピー">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                     </button>
                 </div>
-                <p class="text-xs text-slate-400 mt-2">ファイルを送る相手にこのIDを伝えてください。</p>
+                <p class="text-[10px] text-slate-400 mt-2">このIDをコピーして相手に伝えてください。</p>
             </div>
 
             <!-- Connect to Someone -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">相手に接続する</h2>
+                <h2 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">相手に接続する</h2>
                 <div class="flex gap-2">
-                    <input type="text" id="remote-peer-id" placeholder="相手のIDを入力..." class="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button id="connect-btn" onclick="connectToPeer()" class="bg-slate-800 text-white px-6 py-2 rounded-xl hover:bg-slate-900 transition">接続</button>
+                    <input type="text" id="remote-peer-id" placeholder="相手のIDを入力..." class="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <button id="connect-btn" onclick="connectToPeer()" class="bg-slate-800 text-white px-5 py-2 rounded-xl hover:bg-slate-900 transition text-sm font-semibold">接続</button>
                 </div>
-                <div id="connection-status" class="mt-2 text-xs font-medium text-slate-400">未接続</div>
+                <div id="connection-status" class="mt-2 text-xs font-bold text-slate-400 italic">未接続</div>
             </div>
         </section>
 
         <!-- Transfer Area -->
-        <section id="transfer-section" class="hidden opacity-50 pointer-events-none transition-opacity duration-500">
-            <div id="drop-zone" class="drop-zone bg-white rounded-3xl p-12 flex flex-col items-center justify-center space-y-4">
+        <section id="transfer-section" class="hidden opacity-50 pointer-events-none transition-all duration-500 scale-95">
+            <div id="drop-zone" class="drop-zone bg-white rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
                 <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 </div>
                 <div class="text-center">
-                    <p class="text-lg font-semibold">ここにファイルをドロップ</p>
-                    <p class="text-slate-400 text-sm">または、ファイルを選択してください</p>
+                    <p class="text-lg font-bold text-slate-700">ここにファイルをドロップ</p>
+                    <p class="text-slate-400 text-sm">または、ファイルを選択してください（複数可）</p>
                 </div>
-                <input type="file" id="file-input" class="hidden">
-                <button onclick="document.getElementById('file-input').click()" class="px-6 py-2 border border-slate-200 rounded-full hover:bg-slate-50 transition">ファイルを選択</button>
+                <input type="file" id="file-input" class="hidden" multiple>
+                <button onclick="document.getElementById('file-input').click()" class="px-8 py-2.5 bg-white border-2 border-slate-100 rounded-full hover:border-blue-200 hover:bg-blue-50 transition font-bold text-slate-600">ファイルを選択</button>
             </div>
         </section>
 
-        <!-- Progress/Logs -->
+        <!-- Progress List -->
+        <div id="progress-container" class="space-y-3 hidden">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">現在の状況</h3>
+            <div id="active-transfers" class="space-y-2">
+                <!-- Progress cards injected here -->
+            </div>
+        </div>
+
+        <!-- Activity Logs -->
         <section id="log-section" class="space-y-3">
-            <h3 class="text-sm font-semibold text-slate-400 uppercase">アクティビティ</h3>
-            <div id="logs" class="space-y-2">
-                <div class="bg-slate-100 p-3 rounded-lg text-sm text-slate-500 text-center">まだログはありません</div>
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">アクティビティ</h3>
+                <button onclick="clearLogs()" class="text-[10px] text-slate-400 hover:underline">ログをクリア</button>
+            </div>
+            <div id="logs" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                <div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border">まだアクティビティはありません</div>
             </div>
         </section>
     </main>
+
+    <!-- Receive Modal Placeholder -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl scale-90 transition-transform">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
+                <span class="p-2 bg-green-100 text-green-600 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                </span>
+                受信完了！
+            </h3>
+            <div id="preview-content" class="mb-6 rounded-2xl overflow-hidden border bg-slate-50 flex items-center justify-center min-h-[200px]">
+                <!-- Preview image or icon will be here -->
+            </div>
+            <div class="flex flex-col gap-2">
+                <p id="preview-filename" class="text-center font-mono text-sm font-bold truncate px-4"></p>
+                <button onclick="closePreview()" class="mt-4 bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-black transition">閉じる</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Noppo Auth Settings
@@ -88,11 +123,10 @@
         const SUPABASE_URL = "https://vvavasrdxguqkiigcxkl.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
 
-        // PeerJS & Transfer State
         let peer = null;
         let conn = null;
 
-        // 1. Noppo Auth Functions
+        // 1. Auth Logic
         function goToLogin() {
             const currentUrl = encodeURIComponent(window.location.href);
             window.location.href = `${AUTH_WORKER_URL}?redirect=${currentUrl}`;
@@ -114,49 +148,47 @@
 
             const token = localStorage.getItem('noppo_token');
             if (token) {
-                const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-                    headers: { "Authorization": `Bearer ${token}`, "apikey": SUPABASE_KEY }
-                });
-                if (response.ok) {
-                    const user = await response.json();
-                    
-                    // メールアドレスの@より前を抽出して表示
-                    const userName = user.email.split('@')[0];
-                    document.getElementById('user-display-name').innerText = userName;
-                    
-                    document.getElementById('login-btn').classList.add('hidden');
-                    document.getElementById('logout-btn').classList.remove('hidden');
-                    initPeer(user.id);
-                    return;
-                }
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+                        headers: { "Authorization": `Bearer ${token}`, "apikey": SUPABASE_KEY }
+                    });
+                    if (response.ok) {
+                        const user = await response.json();
+                        const userName = user.email.split('@')[0];
+                        document.getElementById('user-display-name').innerText = userName;
+                        document.getElementById('login-btn').classList.add('hidden');
+                        document.getElementById('logout-btn').classList.remove('hidden');
+                        initPeer(user.id);
+                        return;
+                    }
+                } catch (e) { console.error("Auth error", e); }
             }
             initPeer(null);
         }
 
-        // 2. Peer Communication
+        // 2. PeerJS Logic
         function initPeer(id) {
             const peerId = id ? `noppo-${id.substring(0, 8)}` : null;
-            peer = new Peer(peerId);
+            peer = new Peer(peerId, { debug: 1 });
 
-            peer.on('open', (id) => {
-                document.getElementById('my-peer-id').innerText = id;
+            peer.on('open', (assignedId) => {
+                document.getElementById('my-peer-id').innerText = assignedId;
                 addLog("転送システムがオンラインになりました");
             });
 
             peer.on('connection', (connection) => {
+                if (conn) conn.close(); // 新しい接続を優先
                 conn = connection;
                 setupConnectionListeners();
-                updateStatus("接続済み: " + conn.peer, true);
             });
 
             peer.on('error', (err) => {
-                console.error(err);
-                addLog("エラー: " + err.type, "error");
+                addLog(`エラー: ${err.type}`, "error");
             });
         }
 
         function connectToPeer() {
-            const remoteId = document.getElementById('remote-peer-id').value;
+            const remoteId = document.getElementById('remote-peer-id').value.trim();
             if (!remoteId) return;
 
             addLog("相手を探しています...");
@@ -166,19 +198,19 @@
 
         function setupConnectionListeners() {
             conn.on('open', () => {
-                updateStatus("接続済み: " + conn.peer, true);
-                addLog("接続が確立されました！ファイルを送れます。");
+                updateStatus(`接続済み: ${conn.peer}`, true);
+                addLog(`接続成功: ${conn.peer}`);
+                window.onbeforeunload = () => "転送中かもしれません。ページを閉じますか？";
             });
 
             conn.on('data', (data) => {
-                if (data.type === 'file-transfer') {
-                    handleReceiveFile(data);
-                }
+                if (data.type === 'file-transfer') handleReceiveFile(data);
             });
 
             conn.on('close', () => {
                 updateStatus("切断されました", false);
                 addLog("接続が切れました。");
+                window.onbeforeunload = null;
             });
         }
 
@@ -186,16 +218,18 @@
             const statusEl = document.getElementById('connection-status');
             const sectionEl = document.getElementById('transfer-section');
             statusEl.innerText = text;
-            statusEl.className = isActive ? "mt-2 text-xs font-bold text-green-500" : "mt-2 text-xs font-medium text-slate-400";
+            statusEl.className = isActive ? "mt-2 text-xs font-bold text-green-500" : "mt-2 text-xs font-bold text-slate-400";
             
             if (isActive) {
                 sectionEl.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+                sectionEl.classList.add('scale-100');
             } else {
                 sectionEl.classList.add('opacity-50', 'pointer-events-none');
+                sectionEl.classList.remove('scale-100');
             }
         }
 
-        // 3. File Transfer Logic
+        // 3. File Transfer & UI Logic
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
 
@@ -204,82 +238,157 @@
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('active');
-            const file = e.dataTransfer.files[0];
-            if (file) sendFile(file);
+            handleFiles(e.dataTransfer.files);
         });
 
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) sendFile(file);
-        });
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        async function handleFiles(fileList) {
+            if (!conn || !conn.open) return addLog("接続が必要です", "error");
+            
+            const files = Array.from(fileList);
+            document.getElementById('progress-container').classList.remove('hidden');
+
+            for (const file of files) {
+                await sendFile(file);
+            }
+        }
 
         function sendFile(file) {
-            if (!conn || !conn.open) {
-                addLog("相手と接続されていません", "error");
-                return;
-            }
+            return new Promise((resolve) => {
+                const transferId = 'tx-' + Math.random().toString(36).substr(2, 9);
+                createProgressCard(transferId, file.name, "送信中...");
 
-            addLog(`送信中: ${file.name} (${formatBytes(file.size)})...`);
-            
-            conn.send({
-                type: 'file-transfer',
-                file: file,
-                fileName: file.name,
-                fileType: file.type
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    conn.send({
+                        type: 'file-transfer',
+                        file: e.target.result,
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileSize: file.size
+                    });
+                    
+                    updateProgressCard(transferId, 100, "送信完了");
+                    addLog(`送信完了: ${file.name}`, "success");
+                    setTimeout(() => removeProgressCard(transferId), 3000);
+                    resolve();
+                };
+
+                // PeerJSの送信自体には標準的なProgressイベントがないため、読み込み完了で一旦100%としています
+                reader.readAsArrayBuffer(file);
             });
-            
-            addLog(`完了: ${file.name} を送信しました！`, "success");
         }
 
         function handleReceiveFile(data) {
             const blob = new Blob([data.file], { type: data.fileType });
             const url = URL.createObjectURL(blob);
             
-            addLog(`受信完了: ${data.fileName}`, "success");
+            addLog(`受信: ${data.fileName}`, "success");
+            showPreview(url, data.fileName, data.fileType);
 
+            // 自動ダウンロード
             const a = document.createElement('a');
             a.href = url;
             a.download = data.fileName;
             a.click();
-            URL.revokeObjectURL(url);
         }
 
-        // Helpers
+        // UI Helpers
+        function createProgressCard(id, name, status) {
+            const container = document.getElementById('active-transfers');
+            const html = `
+                <div id="${id}" class="bg-white p-4 rounded-2xl border shadow-sm space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold truncate max-w-[200px] text-slate-600">${name}</span>
+                        <span id="${id}-status" class="text-blue-500 font-bold">${status}</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div id="${id}-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function updateProgressCard(id, percent, status) {
+            const bar = document.getElementById(`${id}-bar`);
+            const statusEl = document.getElementById(`${id}-status`);
+            if (bar) bar.style.width = percent + '%';
+            if (statusEl) statusEl.innerText = status;
+            if (percent === 100 && statusEl) statusEl.className = "text-green-500 font-bold";
+        }
+
+        function removeProgressCard(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+            if (document.getElementById('active-transfers').children.length === 0) {
+                document.getElementById('progress-container').classList.add('hidden');
+            }
+        }
+
+        function showPreview(url, name, type) {
+            const modal = document.getElementById('preview-modal');
+            const content = document.getElementById('preview-content');
+            const filename = document.getElementById('preview-filename');
+            
+            content.innerHTML = '';
+            filename.innerText = name;
+
+            if (type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'max-h-[300px] object-contain';
+                content.appendChild(img);
+            } else {
+                content.innerHTML = `
+                    <div class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.firstElementChild.classList.remove('scale-90'), 10);
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('preview-modal');
+            modal.firstElementChild.classList.add('scale-90');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+        }
+
         function addLog(message, type = "info") {
             const logs = document.getElementById('logs');
-            const emptyMsg = logs.querySelector('div.text-center');
+            const emptyMsg = document.getElementById('empty-log');
             if (emptyMsg) emptyMsg.remove();
 
             const colors = {
-                info: "bg-white text-slate-600",
+                info: "bg-white text-slate-500 border-slate-100",
                 error: "bg-red-50 text-red-600 border-red-100",
                 success: "bg-green-50 text-green-600 border-green-100"
             };
 
             const div = document.createElement('div');
-            div.className = `p-3 rounded-xl text-sm border shadow-sm ${colors[type]}`;
-            div.innerText = `[${new Date().toLocaleTimeString()}] ${message}`;
+            div.className = `p-3 rounded-xl text-[11px] border shadow-sm transition-all animate-in fade-in slide-in-from-left-2 ${colors[type]}`;
+            div.innerHTML = `<span class="opacity-50 mr-2">${new Date().toLocaleTimeString()}</span> ${message}`;
             logs.prepend(div);
         }
 
-        function formatBytes(bytes, decimals = 2) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '<div id="empty-log" class="bg-white p-4 rounded-xl text-xs text-slate-400 text-center border">まだアクティビティはありません</div>';
         }
 
         function copyMyId() {
             const id = document.getElementById('my-peer-id').innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = id;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            addLog("IDをクリップボードにコピーしました");
+            if (id === "準備中...") return;
+            navigator.clipboard.writeText(id).then(() => {
+                addLog("IDをコピーしました");
+            });
         }
 
         window.onload = checkAuth;
