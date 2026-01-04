@@ -60,7 +60,6 @@
 
             <div id="auth-area" class="flex items-center gap-3">
                 <div id="user-info" class="flex flex-col items-end leading-none">
-                    <!-- 表示名（ID）を表示 -->
                     <span id="user-display-name" class="text-xs font-bold text-slate-900">Guest User</span>
                     <span id="login-perk" class="text-[9px] text-slate-400 font-medium">Login for static ID</span>
                 </div>
@@ -75,7 +74,6 @@
     </header>
 
     <main class="max-w-4xl mx-auto p-4 sm:p-8">
-        
         <!-- Mobile Tabs -->
         <div class="flex sm:hidden bg-white p-1 rounded-xl mb-6 shadow-sm border">
             <button onclick="switchTab('transfer')" id="tab-btn-transfer" class="flex-1 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white">転送</button>
@@ -83,11 +81,8 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
             <!-- Left Column: Connection -->
             <div id="tab-transfer" class="lg:col-span-7 space-y-6 tab-content active">
-                
-                <!-- My ID Card -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Your Transfer ID</h2>
                     <div class="flex items-center justify-between gap-4 w-full">
@@ -95,13 +90,12 @@
                             <span id="my-peer-id" class="mono text-xl sm:text-2xl font-bold text-slate-800 break-all leading-tight">...</span>
                             <span class="text-[10px] text-blue-500 font-bold mt-1">タップしてコピー</span>
                         </button>
-                        <button onclick="showMyQR()" class="flex-shrink-0 p-4 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition shadow-sm active:scale-90 border border-blue-100 ml-2" title="QRコードを表示">
+                        <button onclick="showMyQR()" class="flex-shrink-0 p-4 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition shadow-sm active:scale-90 border border-blue-100 ml-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3"/><path d="M12 14v3"/><path d="M7 12h3"/><path d="M14 12h3"/></svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- Connect Card -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Connect to Device</h2>
                     <div class="space-y-3">
@@ -118,7 +112,6 @@
                     </div>
                 </div>
 
-                <!-- Transfer Drop Zone -->
                 <section id="transfer-section" class="hidden opacity-0 scale-95 transition-all duration-500">
                     <div id="drop-zone" class="drop-zone bg-white rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 shadow-sm">
                         <div class="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center shadow-xl shadow-blue-100 animate-bounce">
@@ -190,8 +183,8 @@
     </div>
 
     <script>
+        // 設定値
         const AUTH_WORKER_URL = "https://noppo-auth.noppo5319.workers.dev";
-        const SUPABASE_URL = "https://vvavasrdxguqkiigcxkl.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
 
         let peer = null;
@@ -210,44 +203,52 @@
             document.getElementById(`tab-btn-${tabId}`).classList.add('bg-blue-600', 'text-white');
         }
 
+        // 最新のチケット方式に対応したユーザー情報取得処理
         async function checkAuth() {
             const params = new URLSearchParams(window.location.search);
-            const token = params.get('token') || localStorage.getItem('noppo_token');
-            
-            if (params.get('token')) {
-                localStorage.setItem('noppo_token', params.get('token'));
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
+            const ticket = params.get('ticket'); // URLからチケットを取得
 
-            if (token) {
-                try {
-                    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-                        headers: { "Authorization": `Bearer ${token}`, "apikey": SUPABASE_KEY }
-                    });
-                    if (response.ok) {
-                        const user = await response.json();
-                        
-                        // display_name を最優先で使用
-                        const customId = user.user_metadata?.display_name || user.email.split('@')[0];
-                        
-                        document.getElementById('user-display-name').innerText = customId;
-                        document.getElementById('login-perk').innerText = "Premium: Static ID Active";
-                        document.getElementById('login-perk').classList.replace('text-slate-400', 'text-blue-600');
-                        document.getElementById('login-btn').classList.add('hidden');
-                        document.getElementById('logout-btn').classList.remove('hidden');
-                        
-                        initPeer(customId);
-                        return;
+            try {
+                // チケットがあればWorkerに問い合わせて交換、なければ通常のユーザー情報取得を試みる
+                const url = ticket 
+                    ? `${AUTH_WORKER_URL}/auth/v1/user?ticket=${ticket}`
+                    : `${AUTH_WORKER_URL}/auth/v1/user`;
+
+                const res = await fetch(url, {
+                    headers: { "apikey": SUPABASE_KEY }
+                });
+
+                if (res.ok) {
+                    const user = await res.json();
+                    
+                    // ログイン成功したらURLからチケットを消す
+                    if (ticket) {
+                        const cleanUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState({}, document.title, cleanUrl);
                     }
-                } catch (e) {
-                    addLog("認証エラー", "error");
+                    
+                    // display_nameをIDとして使用
+                    const customId = user.user_metadata?.display_name || user.email.split('@')[0];
+                    
+                    document.getElementById('user-display-name').innerText = customId;
+                    document.getElementById('login-perk').innerText = "Premium: Static ID Active";
+                    document.getElementById('login-perk').classList.replace('text-slate-400', 'text-blue-600');
+                    document.getElementById('login-btn').classList.add('hidden');
+                    document.getElementById('logout-btn').classList.remove('hidden');
+                    
+                    initPeer(customId);
+                    return;
                 }
+            } catch (e) {
+                console.error("ログイン情報の取得失敗:", e);
+                addLog("認証エラー", "error");
             }
+            
+            // 未ログインまたはエラー時はランダムIDで開始
             initPeer(null);
         }
 
         function initPeer(id) {
-            // IDがあれば固定ID、なければランダムID
             const peerId = id ? `noppo-${id}` : null;
             if (peer) {
                 peer.destroy();
@@ -285,9 +286,7 @@
                 setupConnectionListeners();
             });
             
-            peer.on('disconnected', () => {
-                peer.reconnect();
-            });
+            peer.on('disconnected', () => peer.reconnect());
 
             peer.on('error', (err) => {
                 if (err.type === 'unavailable-id') {
@@ -327,9 +326,6 @@
             conn.on('close', () => {
                 updateStatus("Ready for connection", false);
                 addLog("接続終了");
-            });
-            conn.on('error', (err) => {
-                addLog("接続エラー", "error");
             });
         }
 
@@ -474,28 +470,26 @@
         function copyMyId() {
             const id = document.getElementById('my-peer-id').innerText;
             if (id === "...") return;
-            if (!navigator.clipboard) {
-                const textArea = document.createElement("textarea");
-                textArea.value = id;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            } else {
-                navigator.clipboard.writeText(id).then(() => {
-                    addLog("IDをコピーしました", "success");
-                });
-            }
+            const textArea = document.createElement("textarea");
+            textArea.value = id;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            addLog("IDをコピーしました", "success");
         }
 
         function clearLogs() { document.getElementById('logs').innerHTML = '<div id="empty-log" class="h-32 flex items-center justify-center text-slate-300 text-xs italic font-medium">No recent activity</div>'; }
         
         function goToLogin() { 
-            const currentUrl = window.location.origin + window.location.pathname;
-            window.location.href = `${AUTH_WORKER_URL}?redirect=${encodeURIComponent(currentUrl)}`; 
+            const currentUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+            window.location.href = `${AUTH_WORKER_URL}?redirect=${currentUrl}`; 
         }
         
-        function logout() { localStorage.removeItem('noppo_token'); location.reload(); }
+        function logout() { 
+            const currentUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+            window.location.href = `${AUTH_WORKER_URL}/logout?redirect=${currentUrl}`;
+        }
 
         const dz = document.getElementById('drop-zone');
         dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('active'); });
