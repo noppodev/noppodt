@@ -28,30 +28,25 @@
 
         .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Fixed Header with Glassmorphism */
         header {
-            background: rgba(248, 250, 252, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(248, 250, 252, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .n-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 50, 150, 0.04);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 40px rgba(0, 40, 120, 0.04);
             border-radius: 32px;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @media (max-width: 640px) {
-            .n-card { border-radius: 24px; }
-        }
-
         .n-input {
-            background: rgba(241, 245, 249, 0.8);
+            background: rgba(241, 245, 249, 0.7);
             border: 2px solid transparent;
             border-radius: 20px;
             transition: all 0.3s ease;
@@ -60,21 +55,7 @@
         .n-input:focus {
             background: #FFFFFF;
             border-color: var(--noppo-blue);
-            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.06);
-        }
-
-        .progress-container {
-            height: 6px;
-            background: #F1F5F9;
-            border-radius: 100px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0066FF, #3B82F6);
-            width: 0%;
-            transition: width 0.2s ease;
-            border-radius: 100px;
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.08);
         }
 
         .btn-primary {
@@ -82,8 +63,14 @@
             color: white;
             border-radius: 20px;
             font-weight: 800;
-            box-shadow: 0 10px 20px -5px rgba(0, 102, 255, 0.3);
+            box-shadow: 0 12px 24px -6px rgba(0, 102, 255, 0.35);
             transition: all 0.3s ease;
+        }
+
+        .btn-primary:disabled {
+            background: #CBD5E1;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
         .drop-zone {
@@ -92,14 +79,23 @@
             border-radius: 32px;
             transition: all 0.3s ease;
         }
-        .drop-zone.active {
-            border-color: var(--noppo-blue);
-            background: rgba(240, 249, 255, 0.8);
-            transform: scale(0.98);
+
+        .drop-zone.disabled {
+            opacity: 0.6;
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066FF, #60A5FA);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 100px;
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -107,28 +103,27 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <header class="sticky top-0 z-[60] px-4 sm:px-8 py-4 sm:py-6">
+    <header class="sticky top-0 z-[60] px-4 sm:px-8 py-4 sm:py-5">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3 sm:gap-5">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#0066FF] rounded-[14px] sm:rounded-[18px] flex items-center justify-center text-white shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 bg-[#0066FF] rounded-2xl flex items-center justify-center text-white shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-black tracking-tighter leading-none mb-1">Noppo <span class="text-[#0066FF]">DT</span></h1>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-80">Direct Transfer Pro</p>
+                    <h1 class="text-xl font-black tracking-tighter leading-none mb-1">Noppo <span class="text-[#0066FF]">DT</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Hyper Transfer</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 sm:gap-8">
-                <div class="hidden md:block text-right">
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden sm:block text-right">
                     <p id="user-name" class="text-sm font-extrabold text-slate-800">Guest</p>
                     <div class="flex items-center justify-end gap-1.5">
                         <div id="auth-indicator" class="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
                         <p id="user-status" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Offline</p>
                     </div>
                 </div>
-                <button id="auth-btn" onclick="handleAuthAction()" class="bg-slate-900 text-white px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black hover:bg-black transition-all active:scale-95 shadow-md">
+                <button id="auth-btn" onclick="handleAuthAction()" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[11px] font-black hover:bg-black transition-all active:scale-95">
                     ログイン
                 </button>
             </div>
@@ -136,59 +131,58 @@
     </header>
 
     <main class="max-w-5xl mx-auto w-full p-4 sm:p-8 flex-grow">
-        <!-- Hero ID Section -->
-        <section class="mb-8 sm:mb-12 text-center animate-up">
-            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Your Device Identity</h3>
-            <div class="inline-flex flex-col sm:flex-row items-center gap-3 sm:gap-6 px-6 sm:px-10 py-4 sm:py-5 bg-white rounded-2xl sm:rounded-[32px] shadow-sm border border-slate-100 w-full sm:w-auto">
-                <div id="my-peer-id" class="mono text-lg sm:text-2xl font-bold text-slate-800 tracking-tight break-all">Connecting...</div>
-                <div class="hidden sm:block h-6 w-[1px] bg-slate-200"></div>
-                <div class="flex gap-4">
+        <!-- Identity Section -->
+        <section class="mb-10 text-center animate-up">
+            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Device Identity</h3>
+            <div class="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-5 bg-white/80 rounded-[32px] shadow-sm border border-white w-full sm:w-auto">
+                <div id="my-peer-id" class="mono text-lg sm:text-xl font-bold text-slate-800 tracking-tight break-all">Initializing...</div>
+                <div class="flex gap-4 border-t sm:border-t-0 sm:border-l border-slate-100 pt-4 sm:pt-0 sm:pl-4">
                     <button onclick="copyId()" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                     </button>
                     <button onclick="showQR()" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 21v.01"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- Main Interaction Area -->
+        <!-- Connection & Transfer Area -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12">
             <!-- Connection Panel -->
             <div class="n-card p-6 sm:p-10 animate-up" style="animation-delay: 0.1s">
-                <div class="flex justify-between items-center mb-6 sm:mb-8">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Establish Link</h3>
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Connect</h3>
                     <div id="conn-status" class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full">
                         <div id="status-dot" class="w-2 h-2 rounded-full bg-slate-300"></div>
-                        <span id="status-text" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Disconnected</span>
+                        <span id="status-text" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Waiting</span>
                     </div>
                 </div>
-                <div class="space-y-4 sm:space-y-6">
+                <div class="space-y-5">
                     <div class="relative">
-                        <input type="text" id="target-id" placeholder="相手のDevice IDを入力" class="n-input w-full px-5 sm:px-7 py-4 sm:py-5 text-sm outline-none">
+                        <input type="text" id="target-id" placeholder="相手のIDを入力" class="n-input w-full px-6 py-4 text-sm outline-none">
                         <button onclick="openScan()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h1"/><path d="M7 12h10"/><path d="M7 17h10"/><path d="M12 7h5"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h1"/><path d="M7 12h10"/><path d="M7 17h10"/><path d="M12 7h5"/></svg>
                         </button>
                     </div>
-                    <button id="conn-btn" onclick="startConnect()" class="btn-primary w-full py-4 sm:py-5 text-xs sm:text-sm uppercase tracking-[0.15em]">
+                    <button id="conn-btn" onclick="startConnect()" class="btn-primary w-full py-4 text-xs uppercase tracking-widest">
                         Connect Device
                     </button>
                 </div>
             </div>
 
-            <!-- Transfer Panel -->
-            <div id="drop-zone" class="n-card p-3 sm:p-4 drop-zone animate-up" style="animation-delay: 0.2s">
-                <div class="bg-white/40 border border-white/60 rounded-[24px] sm:rounded-[36px] h-full p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-4 sm:gap-6">
-                    <div id="drop-icon" class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl sm:rounded-3xl flex items-center justify-center text-slate-200 shadow-sm transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <!-- Transfer Panel (Locked until connected) -->
+            <div id="drop-zone" class="n-card p-3 drop-zone disabled animate-up" style="animation-delay: 0.2s">
+                <div class="bg-white/40 border border-white/60 rounded-[30px] h-full p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-5">
+                    <div id="drop-icon" class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-200 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-lg sm:text-xl font-extrabold mb-1 tracking-tight">Drop & Send</h2>
-                        <p class="text-slate-400 text-[10px] sm:text-xs font-medium leading-relaxed max-w-[180px]">大容量ファイルもそのまま高速転送</p>
+                        <h2 id="drop-title" class="text-lg font-extrabold mb-1 tracking-tight">デバイス未接続</h2>
+                        <p id="drop-desc" class="text-slate-400 text-[10px] font-medium leading-relaxed max-w-[200px]">ファイルを送信するには先にデバイスを接続してください</p>
                     </div>
-                    <input type="file" id="file-input" class="hidden" multiple>
-                    <button onclick="document.getElementById('file-input').click()" class="bg-slate-900 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs hover:bg-black transition-all active:scale-95 shadow-lg uppercase tracking-widest">
+                    <input type="file" id="file-input" class="hidden" multiple disabled>
+                    <button id="file-btn" onclick="document.getElementById('file-input').click()" disabled class="bg-slate-300 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all cursor-not-allowed">
                         Select Files
                     </button>
                 </div>
@@ -198,28 +192,27 @@
         <!-- Transfer List -->
         <section class="animate-up" style="animation-delay: 0.3s">
             <div class="flex justify-between items-center mb-6 px-4">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Live Transfers</h3>
-                <button onclick="clearLogs()" class="text-[10px] font-black text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest">Clear</button>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Transfer Queue</h3>
+                <button onclick="clearLogs()" class="text-[10px] font-black text-slate-300 hover:text-blue-600 transition-colors uppercase tracking-widest">Clear All</button>
             </div>
             <div id="transfer-list" class="space-y-4">
-                <div id="empty-hint" class="py-16 sm:py-24 text-center border-2 border-dashed border-slate-100 rounded-[32px] sm:rounded-[40px] bg-white/30">
-                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Waiting for data...</p>
+                <div id="empty-hint" class="py-20 text-center border-2 border-dashed border-slate-100 rounded-[40px] bg-white/30">
+                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No active transfers</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="p-8 sm:p-10 text-center opacity-30">
-        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">P2P Encrypted Channel</p>
+    <footer class="p-10 text-center opacity-20">
+        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">Direct-Peer Encryption Enabled</p>
     </footer>
 
     <!-- QR Modal -->
-    <div id="modal-qr" class="fixed inset-0 bg-slate-900/20 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6" onclick="closeModal('modal-qr')">
-        <div class="bg-white rounded-[40px] sm:rounded-[56px] p-8 sm:p-12 max-w-sm w-full shadow-2xl animate-up" onclick="event.stopPropagation()">
+    <div id="modal-qr" class="fixed inset-0 bg-slate-900/10 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6" onclick="closeModal('modal-qr')">
+        <div class="bg-white rounded-[48px] p-10 max-w-sm w-full shadow-2xl animate-up" onclick="event.stopPropagation()">
             <div class="flex flex-col items-center text-center">
-                <div class="w-12 h-1 bg-slate-100 rounded-full mb-8"></div>
-                <h4 class="font-black text-xl sm:text-2xl mb-3 tracking-tight">Device QR</h4>
-                <p class="text-xs text-slate-400 mb-8 px-4">カメラで読み取って接続します</p>
+                <h4 class="font-black text-xl mb-3 tracking-tight">Connect via QR</h4>
+                <p class="text-[11px] text-slate-400 mb-8">カメラでスキャンして瞬時にリンク</p>
                 <div id="qrcode" class="p-6 bg-slate-50 rounded-[32px] mb-8 border border-slate-100"></div>
                 <button onclick="closeModal('modal-qr')" class="w-full btn-primary py-4 text-xs uppercase tracking-widest">Close</button>
             </div>
@@ -227,25 +220,22 @@
     </div>
 
     <!-- Scan Modal -->
-    <div id="modal-scan" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6 sm:p-8" onclick="closeScan()">
-        <div id="reader" class="w-full max-w-lg aspect-square overflow-hidden rounded-[32px] sm:rounded-[56px] border-4 border-white/10 shadow-2xl"></div>
-        <div class="mt-8 flex flex-col items-center gap-4">
-            <h5 class="text-white text-base font-bold tracking-tight">QR Scanner</h5>
-            <button onclick="closeScan()" class="bg-white/10 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/20">Cancel</button>
-        </div>
+    <div id="modal-scan" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6" onclick="closeScan()">
+        <div id="reader" class="w-full max-w-md aspect-square overflow-hidden rounded-[40px] border-2 border-white/10"></div>
+        <button onclick="closeScan()" class="mt-8 bg-white/10 text-white px-10 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/20">Cancel</button>
     </div>
 
     <script>
         const AUTH_WORKER = "https://noppo-auth.noppo5319.workers.dev";
         const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
-        const CHUNK_SIZE = 256 * 1024; // 256KB に拡大してオーバーヘッドを削減
-
+        
+        // --- High Performance Config ---
+        const CHUNK_SIZE = 1024 * 1024; // 1MB チャンクで転送効率を最大化
         let peer = null;
         let activeConn = null;
         let currentUser = null;
         let receivingFiles = {};
 
-        // --- Auth ---
         async function loadUser() {
             const ticket = new URLSearchParams(window.location.search).get('ticket');
             const cached = localStorage.getItem('noppo_user');
@@ -261,22 +251,16 @@
                 }
             } catch (e) {}
 
-            if (currentUser) {
-                const name = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
-                updateUserUI(name, true);
-                setupPeer(name);
-            } else {
-                updateUserUI("Guest", false);
-                setupPeer(null);
-            }
+            const name = currentUser ? (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]) : null;
+            updateUserUI(name || "Guest", !!currentUser);
+            setupPeer(name);
         }
 
         function updateUserUI(name, loggedIn) {
             document.getElementById('user-name').innerText = name;
-            document.getElementById('user-status').innerText = loggedIn ? 'Account Linked' : 'Offline';
+            document.getElementById('user-status').innerText = loggedIn ? 'Authorized' : 'Offline';
             document.getElementById('auth-btn').innerText = loggedIn ? 'ログアウト' : 'ログイン';
-            const indicator = document.getElementById('auth-indicator');
-            if (loggedIn) indicator.className = "w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm";
+            document.getElementById('auth-indicator').className = `w-1.5 h-1.5 rounded-full ${loggedIn ? 'bg-blue-500' : 'bg-slate-300'}`;
         }
 
         function handleAuthAction() {
@@ -288,9 +272,8 @@
             }
         }
 
-        // --- PeerJS ---
         function setupPeer(name, suffix = "") {
-            const id = name ? `noppo-${name}${suffix}` : null;
+            const id = name ? `noppo-${name}${suffix}`.toLowerCase().replace(/[^a-z0-9-]/g, '') : null;
             if (peer) peer.destroy();
             peer = new Peer(id, {
                 debug: 1,
@@ -307,14 +290,14 @@
                 handleConnection(conn);
             });
             peer.on('error', err => {
-                if (err.type === 'unavailable-id') setupPeer(name, "-" + Math.floor(1000 + Math.random() * 9000));
+                if (err.type === 'unavailable-id') setupPeer(name, "-" + Math.floor(Math.random() * 9000));
             });
         }
 
         function startConnect() {
             const tid = document.getElementById('target-id').value.trim();
             if (!tid || !peer.open) return;
-            updateConnStatus("Connecting...", true);
+            updateConnStatus("Connecting", true);
             const conn = peer.connect(tid, { reliable: true });
             activeConn = conn;
             handleConnection(conn);
@@ -323,7 +306,7 @@
         function handleConnection(conn) {
             conn.on('open', () => {
                 updateConnStatus(`Linked`, true);
-                document.getElementById('drop-icon').classList.add('text-blue-500');
+                enableTransferUI(true);
             });
             conn.on('data', data => {
                 if (data.type === 'file-start') {
@@ -334,40 +317,63 @@
                     if (!info) return;
                     info.chunks[data.index] = data.chunk;
                     info.received++;
-                    // 10%ごとのUI更新に間引きして高速化
-                    if (info.received % Math.max(1, Math.floor(info.total / 10)) === 0 || info.received === info.total) {
+                    if (info.received % 5 === 0 || info.received === info.total) {
                         const pct = Math.floor((info.received / info.total) * 100);
-                        updateProgressUI(data.fileId, pct, `Receiving ${pct}%`);
+                        updateProgressUI(data.fileId, pct, `${pct}%`);
                     }
                     if (info.received === info.total) finalizeDownload(data.fileId);
                 }
             });
             conn.on('close', () => {
                 updateConnStatus("Disconnected", false);
-                document.getElementById('drop-icon').classList.remove('text-blue-500');
+                enableTransferUI(false);
             });
         }
 
-        // --- Optimized Transfer ---
+        function enableTransferUI(enabled) {
+            const dz = document.getElementById('drop-zone');
+            const input = document.getElementById('file-input');
+            const btn = document.getElementById('file-btn');
+            const title = document.getElementById('drop-title');
+            const desc = document.getElementById('drop-desc');
+            const icon = document.getElementById('drop-icon');
+
+            if (enabled) {
+                dz.classList.remove('disabled');
+                input.disabled = false;
+                btn.disabled = false;
+                btn.className = "bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg";
+                title.innerText = "Drop & Send";
+                desc.innerText = "ファイルをここにドロップして送信";
+                icon.className = "w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-500 shadow-sm";
+            } else {
+                dz.classList.add('disabled');
+                input.disabled = true;
+                btn.disabled = true;
+                btn.className = "bg-slate-300 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest cursor-not-allowed";
+                title.innerText = "デバイス未接続";
+                desc.innerText = "ファイルを送信するには先にデバイスを接続してください";
+                icon.className = "w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-200 shadow-sm";
+            }
+        }
+
         async function sendFiles(files) {
             if (!activeConn || !activeConn.open) return;
             for (const file of files) {
-                const fileId = 'f' + Date.now() + Math.floor(Math.random() * 1000);
+                const fileId = 'f' + Math.random().toString(36).substr(2, 9);
                 const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
                 addProgressUI(fileId, file.name, 'sending');
                 activeConn.send({ type: 'file-start', fileId, name: file.name, mime: file.type, totalChunks });
 
                 for (let i = 0; i < totalChunks; i++) {
-                    const start = i * CHUNK_SIZE;
-                    const chunk = await file.slice(start, start + CHUNK_SIZE).arrayBuffer();
+                    const chunk = await file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE).arrayBuffer();
                     activeConn.send({ type: 'file-chunk', fileId, index: i, chunk });
                     
-                    if (i % Math.max(1, Math.floor(totalChunks / 10)) === 0 || i === totalChunks - 1) {
+                    if (i % 5 === 0 || i === totalChunks - 1) {
                         const pct = Math.floor(((i + 1) / totalChunks) * 100);
-                        updateProgressUI(fileId, pct, `Sending ${pct}%`);
+                        updateProgressUI(fileId, pct, `${pct}%`);
                     }
-                    // 高速化のため待機を最小限に。ブラウザがフリーズしない程度に制御。
-                    if (i % 20 === 0) await new Promise(r => setTimeout(r, 0));
+                    if (i % 30 === 0) await new Promise(r => setTimeout(r, 0)); // UI更新用スロット
                 }
                 updateProgressUI(fileId, 100, "Done");
             }
@@ -385,7 +391,6 @@
             delete receivingFiles[fileId];
         }
 
-        // --- UI ---
         function updateConnStatus(text, active) {
             document.getElementById('status-text').innerText = text;
             document.getElementById('status-dot').className = `w-2 h-2 rounded-full ${active ? 'bg-blue-500 animate-pulse' : 'bg-slate-300'}`;
@@ -395,20 +400,20 @@
             const hint = document.getElementById('empty-hint');
             if (hint) hint.remove();
             const html = `
-                <div id="${id}" class="n-card p-5 sm:p-8 animate-up">
+                <div id="${id}" class="n-card p-6 animate-up">
                     <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                            <div class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl ${mode === 'sending' ? 'bg-blue-50 text-blue-500' : 'bg-emerald-50 text-emerald-500'} flex items-center justify-center">
+                        <div class="flex items-center gap-4 overflow-hidden">
+                            <div class="w-10 h-10 shrink-0 rounded-xl ${mode === 'sending' ? 'bg-blue-50 text-blue-500' : 'bg-emerald-50 text-emerald-500'} flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${mode === 'sending' ? 'm5 12 7-7 7 7M12 19V5' : 'm19 12-7 7-7-7M12 5v14'}"/></svg>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">${mode === 'sending' ? 'Sending' : 'Receiving'}</p>
-                                <p class="text-xs sm:text-sm font-bold text-slate-700 truncate">${name}</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${mode === 'sending' ? 'Sending' : 'Receiving'}</p>
+                                <p class="text-xs font-bold text-slate-700 truncate">${name}</p>
                             </div>
                         </div>
-                        <span id="${id}-stat" class="shrink-0 text-[8px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md">Wait</span>
+                        <span id="${id}-stat" class="shrink-0 text-[9px] font-black text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">Wait</span>
                     </div>
-                    <div class="progress-container"><div id="${id}-bar" class="progress-fill"></div></div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div id="${id}-bar" class="progress-fill"></div></div>
                 </div>`;
             document.getElementById('transfer-list').insertAdjacentHTML('afterbegin', html);
         }
@@ -434,7 +439,7 @@
         function openScan() {
             document.getElementById('modal-scan').classList.replace('hidden', 'flex');
             qrScanner = new Html5Qrcode("reader");
-            qrScanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (text) => {
+            qrScanner.start({ facingMode: "environment" }, { fps: 24, qrbox: 250 }, (text) => {
                 document.getElementById('target-id').value = text;
                 closeScan();
                 startConnect();
@@ -453,9 +458,13 @@
         }
 
         const dz = document.getElementById('drop-zone');
-        dz.ondragover = e => { e.preventDefault(); dz.classList.add('active'); };
-        dz.ondragleave = () => dz.classList.remove('active');
-        dz.ondrop = e => { e.preventDefault(); dz.classList.remove('active'); sendFiles(e.dataTransfer.files); };
+        dz.ondragover = e => { e.preventDefault(); if (!activeConn?.open) return; dz.classList.add('border-blue-500', 'bg-blue-50/50'); };
+        dz.ondragleave = () => dz.classList.remove('border-blue-500', 'bg-blue-50/50');
+        dz.ondrop = e => { 
+            e.preventDefault(); 
+            dz.classList.remove('border-blue-500', 'bg-blue-50/50');
+            if (activeConn?.open) sendFiles(e.dataTransfer.files);
+        };
         document.getElementById('file-input').onchange = e => sendFiles(e.target.files);
 
         window.onload = loadUser;
