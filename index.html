@@ -80,6 +80,11 @@
             transition: all 0.3s ease;
         }
 
+        .drop-zone.active {
+            border-color: var(--noppo-blue);
+            background: rgba(0, 102, 255, 0.05);
+        }
+
         .drop-zone.disabled {
             opacity: 0.6;
             filter: grayscale(1);
@@ -131,7 +136,6 @@
     </header>
 
     <main class="max-w-5xl mx-auto w-full p-4 sm:p-8 flex-grow">
-        <!-- Identity Section -->
         <section class="mb-10 text-center animate-up">
             <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Device Identity</h3>
             <div class="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-5 bg-white/80 rounded-[32px] shadow-sm border border-white w-full sm:w-auto">
@@ -147,9 +151,7 @@
             </div>
         </section>
 
-        <!-- Connection & Transfer Area -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12">
-            <!-- Connection Panel -->
             <div class="n-card p-6 sm:p-10 animate-up" style="animation-delay: 0.1s">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Connect</h3>
@@ -171,7 +173,6 @@
                 </div>
             </div>
 
-            <!-- Transfer Panel (Locked until connected) -->
             <div id="drop-zone" class="n-card p-3 drop-zone disabled animate-up" style="animation-delay: 0.2s">
                 <div class="bg-white/40 border border-white/60 rounded-[30px] h-full p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-5">
                     <div id="drop-icon" class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-200 shadow-sm">
@@ -189,7 +190,6 @@
             </div>
         </div>
 
-        <!-- Transfer List -->
         <section class="animate-up" style="animation-delay: 0.3s">
             <div class="flex justify-between items-center mb-6 px-4">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Transfer Queue</h3>
@@ -207,7 +207,6 @@
         <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">Direct-Peer Encryption Enabled</p>
     </footer>
 
-    <!-- QR Modal -->
     <div id="modal-qr" class="fixed inset-0 bg-slate-900/10 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6" onclick="closeModal('modal-qr')">
         <div class="bg-white rounded-[48px] p-10 max-w-sm w-full shadow-2xl animate-up" onclick="event.stopPropagation()">
             <div class="flex flex-col items-center text-center">
@@ -219,7 +218,6 @@
         </div>
     </div>
 
-    <!-- Scan Modal -->
     <div id="modal-scan" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6" onclick="closeScan()">
         <div id="reader" class="w-full max-w-md aspect-square overflow-hidden rounded-[40px] border-2 border-white/10"></div>
         <button onclick="closeScan()" class="mt-8 bg-white/10 text-white px-10 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/20">Cancel</button>
@@ -229,12 +227,12 @@
         const AUTH_WORKER = "https://noppo-auth.noppo5319.workers.dev";
         const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
         
-        // --- High Performance Config ---
-        const CHUNK_SIZE = 1024 * 1024; // 1MB チャンクで転送効率を最大化
+        const CHUNK_SIZE = 16384 * 4; // 64KB (WebRTCで安定して送れるサイズ)
         let peer = null;
         let activeConn = null;
         let currentUser = null;
         let receivingFiles = {};
+        let qrScanner = null;
 
         async function loadUser() {
             const ticket = new URLSearchParams(window.location.search).get('ticket');
@@ -275,28 +273,37 @@
         function setupPeer(name, suffix = "") {
             const id = name ? `noppo-${name}${suffix}`.toLowerCase().replace(/[^a-z0-9-]/g, '') : null;
             if (peer) peer.destroy();
+            
             peer = new Peer(id, {
                 debug: 1,
                 config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
             });
+
             peer.on('open', id => {
                 document.getElementById('my-peer-id').innerText = id;
                 generateQR(id);
                 updateConnStatus("Ready", false);
             });
+
             peer.on('connection', conn => {
-                if (activeConn && activeConn.open) return conn.close();
                 activeConn = conn;
                 handleConnection(conn);
             });
+
             peer.on('error', err => {
+                console.error('Peer error:', err);
                 if (err.type === 'unavailable-id') setupPeer(name, "-" + Math.floor(Math.random() * 9000));
+                if (err.type === 'peer-unavailable') {
+                    alert('相手が見つかりませんでした。IDを確認してください。');
+                    updateConnStatus("Ready", false);
+                }
             });
         }
 
         function startConnect() {
             const tid = document.getElementById('target-id').value.trim();
-            if (!tid || !peer.open) return;
+            if (!tid || !peer || !peer.open) return;
+            
             updateConnStatus("Connecting", true);
             const conn = peer.connect(tid, { reliable: true });
             activeConn = conn;
@@ -308,6 +315,7 @@
                 updateConnStatus(`Linked`, true);
                 enableTransferUI(true);
             });
+
             conn.on('data', data => {
                 if (data.type === 'file-start') {
                     receivingFiles[data.fileId] = { chunks: [], total: data.totalChunks, received: 0, name: data.name, mime: data.mime };
@@ -317,16 +325,19 @@
                     if (!info) return;
                     info.chunks[data.index] = data.chunk;
                     info.received++;
-                    if (info.received % 5 === 0 || info.received === info.total) {
+                    
+                    if (info.received % 10 === 0 || info.received === info.total) {
                         const pct = Math.floor((info.received / info.total) * 100);
                         updateProgressUI(data.fileId, pct, `${pct}%`);
                     }
                     if (info.received === info.total) finalizeDownload(data.fileId);
                 }
             });
+
             conn.on('close', () => {
                 updateConnStatus("Disconnected", false);
                 enableTransferUI(false);
+                activeConn = null;
             });
         }
 
@@ -369,11 +380,11 @@
                     const chunk = await file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE).arrayBuffer();
                     activeConn.send({ type: 'file-chunk', fileId, index: i, chunk });
                     
-                    if (i % 5 === 0 || i === totalChunks - 1) {
+                    if (i % 10 === 0 || i === totalChunks - 1) {
                         const pct = Math.floor(((i + 1) / totalChunks) * 100);
                         updateProgressUI(fileId, pct, `${pct}%`);
                     }
-                    if (i % 30 === 0) await new Promise(r => setTimeout(r, 0)); // UI更新用スロット
+                    if (i % 20 === 0) await new Promise(r => setTimeout(r, 0)); 
                 }
                 updateProgressUI(fileId, 100, "Done");
             }
@@ -434,7 +445,12 @@
         function showQR() { document.getElementById('modal-qr').classList.replace('hidden', 'flex'); }
         function closeModal(id) { document.getElementById(id).classList.replace('flex', 'hidden'); }
         function copyId() { navigator.clipboard.writeText(document.getElementById('my-peer-id').innerText); }
-        function clearLogs() { document.getElementById('transfer-list').innerHTML = ''; }
+        function clearLogs() { 
+            const list = document.getElementById('transfer-list');
+            list.innerHTML = `<div id="empty-hint" class="py-20 text-center border-2 border-dashed border-slate-100 rounded-[40px] bg-white/30">
+                <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No active transfers</p>
+            </div>`;
+        }
 
         function openScan() {
             document.getElementById('modal-scan').classList.replace('hidden', 'flex');
@@ -443,14 +459,14 @@
                 document.getElementById('target-id').value = text;
                 closeScan();
                 startConnect();
-            }).catch(() => closeScan());
+            }).catch(() => {});
         }
 
         function closeScan() {
-            if (window.qrScanner) {
-                window.qrScanner.stop().finally(() => {
+            if (qrScanner) {
+                qrScanner.stop().finally(() => {
                     document.getElementById('modal-scan').classList.replace('flex', 'hidden');
-                    window.qrScanner = null;
+                    qrScanner = null;
                 });
             } else {
                 document.getElementById('modal-scan').classList.replace('flex', 'hidden');
@@ -458,11 +474,14 @@
         }
 
         const dz = document.getElementById('drop-zone');
-        dz.ondragover = e => { e.preventDefault(); if (!activeConn?.open) return; dz.classList.add('border-blue-500', 'bg-blue-50/50'); };
-        dz.ondragleave = () => dz.classList.remove('border-blue-500', 'bg-blue-50/50');
+        dz.ondragover = e => { 
+            e.preventDefault(); 
+            if (activeConn?.open) dz.classList.add('active'); 
+        };
+        dz.ondragleave = () => dz.classList.remove('active');
         dz.ondrop = e => { 
             e.preventDefault(); 
-            dz.classList.remove('border-blue-500', 'bg-blue-50/50');
+            dz.classList.remove('active');
             if (activeConn?.open) sendFiles(e.dataTransfer.files);
         };
         document.getElementById('file-input').onchange = e => sendFiles(e.target.files);
