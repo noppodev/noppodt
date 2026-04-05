@@ -13,7 +13,7 @@
         
         :root {
             --noppo-blue: #0066FF;
-            --noppo-bg: #F8FAFC;
+            --noppo-bg: #F0F4FF;
         }
 
         body { 
@@ -22,31 +22,31 @@
             color: #0F172A;
             letter-spacing: -0.025em;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.03) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 102, 255, 0.03) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 102, 255, 0.08) 0px, transparent 50%);
         }
 
         .mono { font-family: 'JetBrains Mono', monospace; }
 
         header {
-            background: rgba(248, 250, 252, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .n-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 12px 40px rgba(0, 40, 120, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 102, 255, 0.05);
             border-radius: 32px;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .n-input {
-            background: rgba(241, 245, 249, 0.7);
+            background: rgba(255, 255, 255, 0.5);
             border: 2px solid transparent;
             border-radius: 20px;
             transition: all 0.3s ease;
@@ -55,7 +55,7 @@
         .n-input:focus {
             background: #FFFFFF;
             border-color: var(--noppo-blue);
-            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
         }
 
         .btn-primary {
@@ -63,7 +63,7 @@
             color: white;
             border-radius: 20px;
             font-weight: 800;
-            box-shadow: 0 12px 24px -6px rgba(0, 102, 255, 0.35);
+            box-shadow: 0 8px 20px -4px rgba(0, 102, 255, 0.4);
             transition: all 0.3s ease;
         }
 
@@ -74,19 +74,20 @@
         }
 
         .drop-zone {
-            border: 2px dashed #E2E8F0;
-            background: rgba(255, 255, 255, 0.4);
+            border: 2px dashed rgba(0, 102, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 32px;
             transition: all 0.3s ease;
         }
 
         .drop-zone.active {
             border-color: var(--noppo-blue);
-            background: rgba(0, 102, 255, 0.05);
+            background: rgba(0, 102, 255, 0.08);
+            transform: scale(1.02);
         }
 
         .drop-zone.disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             filter: grayscale(1);
             cursor: not-allowed;
         }
@@ -95,7 +96,7 @@
             height: 100%;
             background: linear-gradient(90deg, #0066FF, #60A5FA);
             width: 0%;
-            transition: width 0.1s linear;
+            transition: width 0.2s ease-out;
             border-radius: 100px;
         }
 
@@ -116,7 +117,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-black tracking-tighter leading-none mb-1">Noppo <span class="text-[#0066FF]">DT</span></h1>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Hyper Transfer</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Direct Transfer</p>
                 </div>
             </div>
 
@@ -137,10 +138,10 @@
 
     <main class="max-w-5xl mx-auto w-full p-4 sm:p-8 flex-grow">
         <section class="mb-10 text-center animate-up">
-            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Device Identity</h3>
-            <div class="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-5 bg-white/80 rounded-[32px] shadow-sm border border-white w-full sm:w-auto">
+            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Your ID</h3>
+            <div class="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-5 n-card w-full sm:w-auto">
                 <div id="my-peer-id" class="mono text-lg sm:text-xl font-bold text-slate-800 tracking-tight break-all">Initializing...</div>
-                <div class="flex gap-4 border-t sm:border-t-0 sm:border-l border-slate-100 pt-4 sm:pt-0 sm:pl-4">
+                <div class="flex gap-4 border-t sm:border-t-0 sm:border-l border-white/40 pt-4 sm:pt-0 sm:pl-4">
                     <button onclick="copyId()" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                     </button>
@@ -155,7 +156,7 @@
             <div class="n-card p-6 sm:p-10 animate-up" style="animation-delay: 0.1s">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Connect</h3>
-                    <div id="conn-status" class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full">
+                    <div id="conn-status" class="flex items-center gap-2 bg-white/40 px-3 py-1.5 rounded-full border border-white/50">
                         <div id="status-dot" class="w-2 h-2 rounded-full bg-slate-300"></div>
                         <span id="status-text" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Waiting</span>
                     </div>
@@ -167,16 +168,16 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h1"/><path d="M7 12h10"/><path d="M7 17h10"/><path d="M12 7h5"/></svg>
                         </button>
                     </div>
-                    <button id="conn-btn" onclick="startConnect()" class="btn-primary w-full py-4 text-xs uppercase tracking-widest">
+                    <button id="conn-btn" onclick="startConnect()" class="btn-primary w-full py-4 text-xs uppercase tracking-widest hover:scale-[1.01] active:scale-[0.98]">
                         Connect Device
                     </button>
                 </div>
             </div>
 
             <div id="drop-zone" class="n-card p-3 drop-zone disabled animate-up" style="animation-delay: 0.2s">
-                <div class="bg-white/40 border border-white/60 rounded-[30px] h-full p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-5">
-                    <div id="drop-icon" class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-200 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <div class="bg-white/30 border border-white/60 rounded-[30px] h-full p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-5">
+                    <div id="drop-icon" class="w-16 h-16 bg-white/80 rounded-2xl flex items-center justify-center text-slate-300 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                     </div>
                     <div>
                         <h2 id="drop-title" class="text-lg font-extrabold mb-1 tracking-tight">デバイス未接続</h2>
@@ -196,23 +197,23 @@
                 <button onclick="clearLogs()" class="text-[10px] font-black text-slate-300 hover:text-blue-600 transition-colors uppercase tracking-widest">Clear All</button>
             </div>
             <div id="transfer-list" class="space-y-4">
-                <div id="empty-hint" class="py-20 text-center border-2 border-dashed border-slate-100 rounded-[40px] bg-white/30">
+                <div id="empty-hint" class="py-20 text-center border-2 border-dashed border-white/50 rounded-[40px] bg-white/20">
                     <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No active transfers</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="p-10 text-center opacity-20">
-        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">Direct-Peer Encryption Enabled</p>
+    <footer class="p-10 text-center opacity-30">
+        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500">P2P Encryption Enabled • NoppoStudio</p>
     </footer>
 
     <div id="modal-qr" class="fixed inset-0 bg-slate-900/10 backdrop-blur-2xl z-[100] hidden items-center justify-center p-6" onclick="closeModal('modal-qr')">
-        <div class="bg-white rounded-[48px] p-10 max-w-sm w-full shadow-2xl animate-up" onclick="event.stopPropagation()">
+        <div class="bg-white/90 border border-white rounded-[48px] p-10 max-w-sm w-full shadow-2xl animate-up" onclick="event.stopPropagation()">
             <div class="flex flex-col items-center text-center">
                 <h4 class="font-black text-xl mb-3 tracking-tight">Connect via QR</h4>
                 <p class="text-[11px] text-slate-400 mb-8">カメラでスキャンして瞬時にリンク</p>
-                <div id="qrcode" class="p-6 bg-slate-50 rounded-[32px] mb-8 border border-slate-100"></div>
+                <div id="qrcode" class="p-6 bg-white rounded-[32px] mb-8 border border-slate-100 shadow-inner"></div>
                 <button onclick="closeModal('modal-qr')" class="w-full btn-primary py-4 text-xs uppercase tracking-widest">Close</button>
             </div>
         </div>
@@ -227,7 +228,7 @@
         const AUTH_WORKER = "https://noppo-auth.noppo5319.workers.dev";
         const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2YXZhc3JkeGd1cWtpaWdjeGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0MTk5ODcsImV4cCI6MjA4Mjk5NTk4N30.CVq3lyRbxek7Ejs4tP5sN9-0JNEXSLtCsC2Pj-skFFQ";
         
-        const CHUNK_SIZE = 16384 * 4; // 64KB (WebRTCで安定して送れるサイズ)
+        const CHUNK_SIZE = 16384 * 4; 
         let peer = null;
         let activeConn = null;
         let currentUser = null;
@@ -274,28 +275,45 @@
             const id = name ? `noppo-${name}${suffix}`.toLowerCase().replace(/[^a-z0-9-]/g, '') : null;
             if (peer) peer.destroy();
             
+            // debug: 3 でコンソールに詳細ログを出力
             peer = new Peer(id, {
-                debug: 1,
-                config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+                debug: 3,
+                config: { 
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' }, 
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' }
+                    ] 
+                }
             });
 
             peer.on('open', id => {
                 document.getElementById('my-peer-id').innerText = id;
                 generateQR(id);
                 updateConnStatus("Ready", false);
+                console.log('Peer ID is: ' + id);
             });
 
             peer.on('connection', conn => {
+                console.log('Incoming connection from: ' + conn.peer);
                 activeConn = conn;
                 handleConnection(conn);
             });
 
             peer.on('error', err => {
-                console.error('Peer error:', err);
-                if (err.type === 'unavailable-id') setupPeer(name, "-" + Math.floor(Math.random() * 9000));
+                console.error('PeerJS Error Type:', err.type);
+                console.error('Full Error Object:', err);
+                
+                if (err.type === 'unavailable-id') {
+                    setupPeer(name, "-" + Math.floor(Math.random() * 9000));
+                }
                 if (err.type === 'peer-unavailable') {
-                    alert('相手が見つかりませんでした。IDを確認してください。');
-                    updateConnStatus("Ready", false);
+                    alert('相手のデバイスが見つかりません。IDが正しいか確認してください。');
+                    updateConnStatus("Not Found", false);
+                }
+                if (err.type === 'network') {
+                    alert('ネットワークに問題があるか、Firewallにブロックされています。');
                 }
             });
         }
@@ -304,6 +322,7 @@
             const tid = document.getElementById('target-id').value.trim();
             if (!tid || !peer || !peer.open) return;
             
+            console.log('Attempting to connect to: ' + tid);
             updateConnStatus("Connecting", true);
             const conn = peer.connect(tid, { reliable: true });
             activeConn = conn;
@@ -312,6 +331,7 @@
 
         function handleConnection(conn) {
             conn.on('open', () => {
+                console.log('Connection established with: ' + conn.peer);
                 updateConnStatus(`Linked`, true);
                 enableTransferUI(true);
             });
@@ -326,7 +346,7 @@
                     info.chunks[data.index] = data.chunk;
                     info.received++;
                     
-                    if (info.received % 10 === 0 || info.received === info.total) {
+                    if (info.received % 5 === 0 || info.received === info.total) {
                         const pct = Math.floor((info.received / info.total) * 100);
                         updateProgressUI(data.fileId, pct, `${pct}%`);
                     }
@@ -335,9 +355,15 @@
             });
 
             conn.on('close', () => {
+                console.log('Connection closed');
                 updateConnStatus("Disconnected", false);
                 enableTransferUI(false);
                 activeConn = null;
+            });
+            
+            conn.on('error', err => {
+                console.error('Connection Error:', err);
+                updateConnStatus("Error", false);
             });
         }
 
@@ -377,6 +403,13 @@
                 activeConn.send({ type: 'file-start', fileId, name: file.name, mime: file.type, totalChunks });
 
                 for (let i = 0; i < totalChunks; i++) {
+                    // バッファがいっぱいなら待機（バックプレッシャー制御）
+                    if (activeConn.bufferSize > CHUNK_SIZE * 20) {
+                        await new Promise(r => setTimeout(r, 50));
+                        i--; // 同じチャンクを再送試行
+                        continue;
+                    }
+
                     const chunk = await file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE).arrayBuffer();
                     activeConn.send({ type: 'file-chunk', fileId, index: i, chunk });
                     
@@ -384,7 +417,6 @@
                         const pct = Math.floor(((i + 1) / totalChunks) * 100);
                         updateProgressUI(fileId, pct, `${pct}%`);
                     }
-                    if (i % 20 === 0) await new Promise(r => setTimeout(r, 0)); 
                 }
                 updateProgressUI(fileId, 100, "Done");
             }
@@ -447,7 +479,7 @@
         function copyId() { navigator.clipboard.writeText(document.getElementById('my-peer-id').innerText); }
         function clearLogs() { 
             const list = document.getElementById('transfer-list');
-            list.innerHTML = `<div id="empty-hint" class="py-20 text-center border-2 border-dashed border-slate-100 rounded-[40px] bg-white/30">
+            list.innerHTML = `<div id="empty-hint" class="py-20 text-center border-2 border-dashed border-white/50 rounded-[40px] bg-white/20">
                 <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No active transfers</p>
             </div>`;
         }
@@ -474,16 +506,9 @@
         }
 
         const dz = document.getElementById('drop-zone');
-        dz.ondragover = e => { 
-            e.preventDefault(); 
-            if (activeConn?.open) dz.classList.add('active'); 
-        };
+        dz.ondragover = e => { e.preventDefault(); if (activeConn?.open) dz.classList.add('active'); };
         dz.ondragleave = () => dz.classList.remove('active');
-        dz.ondrop = e => { 
-            e.preventDefault(); 
-            dz.classList.remove('active');
-            if (activeConn?.open) sendFiles(e.dataTransfer.files);
-        };
+        dz.ondrop = e => { e.preventDefault(); dz.classList.remove('active'); if (activeConn?.open) sendFiles(e.dataTransfer.files); };
         document.getElementById('file-input').onchange = e => sendFiles(e.target.files);
 
         window.onload = loadUser;
